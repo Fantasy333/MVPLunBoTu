@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MVP 人物海报轮播</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(202,116,35,.18), transparent 35%),
+    linear-gradient(135deg, #f8f2ea, #efe6dc);
+  color: #24170f;
+  overflow-x: hidden;
+}
+
+.section {
+  max-width: 1200px;
+  margin: auto;
+  padding: 56px 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 34px;
+}
+
+.header span {
+  color: #b86a1d;
+  letter-spacing: .35em;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.header h1 {
+  margin-top: 12px;
+  font-size: clamp(32px, 5vw, 56px);
+  letter-spacing: .08em;
+}
+
+.header p {
+  margin-top: 12px;
+  color: #7b6a5c;
+  font-size: 14px;
+}
+
+.stage {
+  position: relative;
+  height: 620px;
+  perspective: 1400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.poster {
+  position: absolute;
+  width: 350px;
+  height: 560px;
+  border-radius: 30px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 30px 80px rgba(53, 31, 13, .25);
+  transition: all .7s cubic-bezier(.22, 1, .36, 1);
+  cursor: pointer;
+}
+
+.poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .8s ease;
+}
+
+.poster:hover img {
+  transform: scale(1.04);
+}
+
+.poster::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.55), transparent 45%);
+  opacity: .9;
+}
+
+.poster-info {
+  position: absolute;
+  left: 24px;
+  bottom: 24px;
+  z-index: 2;
+  color: #fff;
+}
+
+.poster-info small {
+  color: #ffb45e;
+  letter-spacing: .25em;
+  font-weight: 800;
+}
+
+.poster-info h2 {
+  margin-top: 8px;
+  font-size: 28px;
+}
+
+.poster-info p {
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: .85;
+}
+
+.poster.active {
+  z-index: 5;
+  transform: translateX(0) translateZ(120px) rotateY(0deg) scale(1);
+  opacity: 1;
+  filter: none;
+}
+
+.poster.left-1 {
+  z-index: 4;
+  transform: translateX(-260px) translateZ(20px) rotateY(22deg) scale(.88);
+  opacity: .9;
+  filter: blur(.2px) saturate(.85);
+}
+
+.poster.right-1 {
+  z-index: 4;
+  transform: translateX(260px) translateZ(20px) rotateY(-22deg) scale(.88);
+  opacity: .9;
+  filter: blur(.2px) saturate(.85);
+}
+
+.poster.left-2 {
+  z-index: 3;
+  transform: translateX(-465px) translateZ(-120px) rotateY(36deg) scale(.72);
+  opacity: .45;
+  filter: blur(1.5px) saturate(.7);
+}
+
+.poster.right-2 {
+  z-index: 3;
+  transform: translateX(465px) translateZ(-120px) rotateY(-36deg) scale(.72);
+  opacity: .45;
+  filter: blur(1.5px) saturate(.7);
+}
+
+.poster.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(.5);
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 12px 22px;
+  background: rgba(255,255,255,.65);
+  backdrop-filter: blur(12px);
+  color: #7a4313;
+  font-weight: 700;
+  box-shadow: 0 10px 30px rgba(120,68,24,.12);
+  transition: .25s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  background: #b86a1d;
+  color: #fff;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(184,106,29,.3);
+  transition: .3s;
+}
+
+.dot.active {
+  width: 28px;
+  background: #b86a1d;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0,0,0,.72);
+  backdrop-filter: blur(10px);
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  position: relative;
+  max-height: 92vh;
+  animation: pop .35s ease;
+}
+
+.modal-content img {
+  max-height: 92vh;
+  max-width: 92vw;
+  border-radius: 26px;
+  box-shadow: 0 30px 90px rgba(0,0,0,.45);
+}
+
+.close {
+  position: absolute;
+  right: -8px;
+  top: -48px;
+  color: #fff;
+  background: rgba(255,255,255,.18);
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .stage {
+    height: 560px;
+  }
+
+  .poster {
+    width: 300px;
+    height: 480px;
+  }
+
+  .poster.left-1 {
+    transform: translateX(-150px) rotateY(28deg) scale(.78);
+  }
+
+  .poster.right-1 {
+    transform: translateX(150px) rotateY(-28deg) scale(.78);
+  }
+
+  .poster.left-2,
+  .poster.right-2 {
+    opacity: 0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<section class="section">
+  <div class="header">
+    <span>MVP FAMILY · STAR WALL</span>
+    <h1>MVP 名人堂</h1>
+    <p>点击人物海报查看高清展示</p>
+  </div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="controls">
+    <button onclick="prevPoster()">上一位</button>
+    <button onclick="nextPoster()">下一位</button>
+  </div>
+
+  <div class="dots" id="dots"></div>
+</section>
+
+<div class="modal" id="modal" onclick="closeModal()">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="close" onclick="closeModal()">关闭</button>
+    <img id="modalImg" src="" alt="">
+  </div>
+</div>
+
+<script>
+const posters = [
+  {
+    name: "刘旭荣",
+    role: "CHAMP MVP",
+    image: "images/liuxurong.png"
+  },
+  {
+    name: "曾媛",
+    role: "CHAMP MVP",
+    image: "images/zengyuan.png"
+  },
+  {
+    name: "陈婷",
+    role: "CHAMP MVP",
+    image: "images/chenting.png"
+  },
+  {
+    name: "邓静",
+    role: "MVP PRO",
+    image: "images/dengjing.png"
+  },
+  {
+    name: "王凌霜",
+    role: "CHAMP MVP",
+    image: "images/wanglingshuang.png"
+  },
+  {
+    name: "张凌骞",
+    role: "MVP STAR",
+    image: "images/zhanglingqian.png"
+  }
+];
+
+let current = 0;
+let timer = null;
+
+const stage = document.getElementById("stage");
+const dots = document.getElementById("dots");
+
+function render() {
+  stage.innerHTML = "";
+  dots.innerHTML = "";
+
+  posters.forEach((item, index) => {
+    const offset = getOffset(index);
+
+    const card = document.createElement("div");
+    card.className = "poster " + getClass(offset);
+    card.onclick = () => openModal(item.image);
+
+    card.innerHTML = `
+      <img src="${item.image}" alt="${item.name}">
+      <div class="poster-info">
+        <small>${item.role}</small>
+        <h2>${item.name}</h2>
+        <p>TOP OF THE TABLE</p>
+      </div>
+    `;
+
+    stage.appendChild(card);
+
+    const dot = document.createElement("div");
+    dot.className = "dot" + (index === current ? " active" : "");
+    dot.onclick = () => {
+      current = index;
+      render();
+      restartAutoPlay();
+    };
+    dots.appendChild(dot);
+  });
+}
+
+function getOffset(index) {
+  let offset = index - current;
+  const half = posters.length / 2;
+
+  if (offset > half) offset -= posters.length;
+  if (offset < -half) offset += posters.length;
+
+  return offset;
+}
+
+function getClass(offset) {
+  if (offset === 0) return "active";
+  if (offset === -1) return "left-1";
+  if (offset === 1) return "right-1";
+  if (offset === -2) return "left-2";
+  if (offset === 2) return "right-2";
+  return "hidden";
+}
+
+function nextPoster() {
+  current = (current + 1) % posters.length;
+  render();
+  restartAutoPlay();
+}
+
+function prevPoster() {
+  current = (current - 1 + posters.length) % posters.length;
+  render();
+  restartAutoPlay();
+}
+
+function openModal(src) {
+  document.getElementById("modalImg").src = src;
+  document.getElementById("modal").classList.add("show");
+  stopAutoPlay();
+}
+
+function closeModal() {
+  document.getElementById("modal").classList.remove("show");
+  restartAutoPlay();
+}
+
+function startAutoPlay() {
+  timer = setInterval(() => {
+    current = (current + 1) % posters.length;
+    render();
+  }, 3200);
+}
+
+function stopAutoPlay() {
+  clearInterval(timer);
+}
+
+function restartAutoPlay() {
+  stopAutoPlay();
+  startAutoPlay();
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight") nextPoster();
+  if (e.key === "ArrowLeft") prevPoster();
+  if (e.key === "Escape") closeModal();
+});
+
+render();
+startAutoPlay();
+</script>
+
+</body>
+</html>
