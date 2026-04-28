@@ -46,12 +46,6 @@ body {
   letter-spacing: .08em;
 }
 
-.header p {
-  margin-top: 12px;
-  color: #7b6a5c;
-  font-size: 14px;
-}
-
 .stage {
   position: relative;
   height: 620px;
@@ -80,7 +74,8 @@ body {
   transition: transform .8s ease;
 }
 
-.poster:hover img {
+.poster:hover img,
+.poster.show-info img {
   transform: scale(1.04);
 }
 
@@ -88,16 +83,33 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,.55), transparent 45%);
-  opacity: .9;
+  background: linear-gradient(to top, rgba(0,0,0,.68), transparent 55%);
+  opacity: 0;
+  transition: opacity .45s ease;
+}
+
+.poster:hover::after,
+.poster.show-info::after {
+  opacity: .92;
 }
 
 .poster-info {
   position: absolute;
   left: 24px;
+  right: 24px;
   bottom: 24px;
   z-index: 2;
   color: #fff;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .45s ease, transform .45s ease;
+  pointer-events: none;
+}
+
+.poster:hover .poster-info,
+.poster.show-info .poster-info {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .poster-info small {
@@ -115,6 +127,13 @@ body {
   margin-top: 6px;
   font-size: 13px;
   opacity: .85;
+  letter-spacing: .08em;
+}
+
+.tap-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  opacity: .68;
 }
 
 .poster.active {
@@ -253,6 +272,23 @@ button:hover {
 }
 
 @media (max-width: 768px) {
+  .section {
+    padding: 36px 14px;
+  }
+
+  .header {
+    margin-bottom: 20px;
+  }
+
+  .header span {
+    font-size: 10px;
+    letter-spacing: .26em;
+  }
+
+  .header h1 {
+    font-size: 34px;
+  }
+
   .stage {
     height: 560px;
   }
@@ -273,6 +309,24 @@ button:hover {
   .poster.left-2,
   .poster.right-2 {
     opacity: 0;
+  }
+
+  .poster-info {
+    left: 20px;
+    right: 20px;
+    bottom: 22px;
+  }
+
+  .poster-info h2 {
+    font-size: 24px;
+  }
+
+  .controls {
+    margin-top: 8px;
+  }
+
+  button {
+    padding: 11px 18px;
   }
 }
 </style>
@@ -305,177 +359,174 @@ button:hover {
 
 <script>
 const posters = [
-  // ⭐️ 最高级别（Lisa放第一个）
   {
     name: "徐光红",
     role: "PREMIER AGENCY LEADER",
     image: "images/lisa.png"
   },
 
-  // ⭐️ 顶尖 TOP OF THE TABLE
   {
     name: "刘旭荣",
-    role: "CHAMP MVP",
+    role: "TOP OF THE TABLE",
     image: "images/liuxurong.png"
   },
   {
     name: "陈婷",
-    role: "CHAMP MVP",
+    role: "TOP OF THE TABLE",
     image: "images/chenting.png"
   },
   {
     name: "邓静",
-    role: "MVP PRO",
+    role: "TOP OF THE TABLE",
     image: "images/dengjing.png"
   },
   {
     name: "王凌霜",
-    role: "CHAMP MVP",
+    role: "TOP OF THE TABLE",
     image: "images/wanglingshuang.png"
   },
   {
     name: "曾媛",
-    role: "CHAMP MVP",
+    role: "TOP OF THE TABLE",
     image: "images/zengyuan.png"
   },
   {
     name: "张凌骞",
-    role: "MVP STAR",
+    role: "TOP OF THE TABLE",
     image: "images/zhanglingqian.png"
   },
 
-  // ⭐️ 中高层（COURT / MDRT层）
   {
-    name: "陈冰燏",
-    role: "MVP PRO",
+    name: "陈冰瑜",
+    role: "COURT OF THE TABLE",
     image: "images/chenbingyu.png"
   },
   {
     name: "陈振龙",
-    role: "MVP PRO",
+    role: "COURT OF THE TABLE",
     image: "images/chenzhenlong.png"
   },
   {
     name: "符瑛娜",
-    role: "CHAMP MVP",
+    role: "COURT OF THE TABLE",
     image: "images/fuyingna.png"
   },
   {
     name: "雷娜",
-    role: "CHAMP MVP",
+    role: "COURT OF THE TABLE",
     image: "images/leina.png"
   },
   {
     name: "梁华珍",
-    role: "CHAMP MVP",
+    role: "COURT OF THE TABLE",
     image: "images/lianghuazhen.png"
   },
   {
     name: "李娇",
-    role: "MVP SPARK",
+    role: "COURT OF THE TABLE",
     image: "images/lijiao.png"
   },
   {
     name: "马艳丽",
-    role: "CHAMP MVP",
+    role: "COURT OF THE TABLE",
     image: "images/mayanli.png"
   },
   {
     name: "申扬",
-    role: "MVP PRO",
+    role: "COURT OF THE TABLE",
     image: "images/shenyang.png"
   },
   {
     name: "张善茹",
-    role: "CHAMP MVP",
+    role: "COURT OF THE TABLE",
     image: "images/zhangshanru.png"
   },
   {
     name: "朱燕萍",
-    role: "CHAMP MVP",
+    role: "COURT OF THE TABLE",
     image: "images/zhuyanping.png"
   },
 
-  // ⭐️ 老牌核心（PREMIER）
   {
     name: "高明珠",
-    role: "MVP PRO",
+    role: "PREMIER AGENCY LEADER",
     image: "images/gaomingzhu.png"
   },
   {
     name: "黄萍",
-    role: "MVP GLORY",
+    role: "PREMIER AGENCY LEADER",
     image: "images/huangping.png"
   },
   {
     name: "李存爵",
-    role: "MVP STAR",
+    role: "PREMIER AGENCY LEADER",
     image: "images/jax.png"
   },
   {
     name: "江南",
-    role: "MVP STAR",
+    role: "PREMIER AGENCY LEADER",
     image: "images/jiangnan.png"
   },
   {
     name: "李宏香",
-    role: "MVP STAR",
+    role: "PREMIER AGENCY LEADER",
     image: "images/lihongxiang.png"
   },
   {
     name: "林淑燕",
-    role: "MVP STAR",
+    role: "PREMIER AGENCY LEADER",
     image: "images/linshuyan.png"
   },
   {
     name: "刘巧林",
-    role: "MVP STAR",
+    role: "PREMIER AGENCY LEADER",
     image: "images/liuqiaolin.png"
   },
   {
     name: "黎子琪",
-    role: "MVP SPARK",
+    role: "PREMIER AGENCY LEADER",
     image: "images/liziqi.png"
   },
   {
     name: "黄晓敏",
-    role: "MVP STAR",
+    role: "PREMIER AGENCY LEADER",
     image: "images/moon.png"
   },
   {
     name: "苏素",
-    role: "MVP STAR",
+    role: "PREMIER AGENCY LEADER",
     image: "images/susu.png"
   },
   {
     name: "韦秋玉",
-    role: "MVP GLORY",
+    role: "PREMIER AGENCY LEADER",
     image: "images/weiqiuyu.png"
   },
   {
     name: "肖峰",
-    role: "MVP PRO",
+    role: "PREMIER AGENCY LEADER",
     image: "images/xiaofeng.png"
   },
   {
     name: "张帆驰",
-    role: "MVP STAR",
+    role: "PREMIER AGENCY LEADER",
     image: "images/zhangfanchi.png"
   },
   {
     name: "张燕",
-    role: "MVP STAR",
+    role: "PREMIER AGENCY LEADER",
     image: "images/zhangyan.png"
   },
   {
     name: "周岚",
-    role: "MVP SPARK",
+    role: "PREMIER AGENCY LEADER",
     image: "images/zhoulan.png"
   }
 ];
 
 let current = 0;
 let timer = null;
+let openedInfoIndex = null;
 
 const stage = document.getElementById("stage");
 const dots = document.getElementById("dots");
@@ -489,10 +540,30 @@ function render() {
 
     const card = document.createElement("div");
     card.className = "poster " + getClass(offset);
-    card.onclick = () => openModal(item.image);
+
+    if (openedInfoIndex === index) {
+      card.classList.add("show-info");
+    }
+
+    card.onclick = () => {
+      if (openedInfoIndex === index) {
+        openModal(item.image);
+        return;
+      }
+
+      openedInfoIndex = index;
+      stopAutoPlay();
+      render();
+    };
 
     card.innerHTML = `
       <img src="${item.image}" alt="${item.name}">
+      <div class="poster-info">
+        <small>MVP FAMILY</small>
+        <h2>${item.name}</h2>
+        <p>${item.role}</p>
+        <div class="tap-hint">再次点击查看完整海报</div>
+      </div>
     `;
 
     stage.appendChild(card);
@@ -501,6 +572,7 @@ function render() {
     dot.className = "dot" + (index === current ? " active" : "");
     dot.onclick = () => {
       current = index;
+      openedInfoIndex = null;
       render();
       restartAutoPlay();
     };
@@ -529,12 +601,14 @@ function getClass(offset) {
 
 function nextPoster() {
   current = (current + 1) % posters.length;
+  openedInfoIndex = null;
   render();
   restartAutoPlay();
 }
 
 function prevPoster() {
   current = (current - 1 + posters.length) % posters.length;
+  openedInfoIndex = null;
   render();
   restartAutoPlay();
 }
@@ -547,12 +621,15 @@ function openModal(src) {
 
 function closeModal() {
   document.getElementById("modal").classList.remove("show");
+  openedInfoIndex = null;
+  render();
   restartAutoPlay();
 }
 
 function startAutoPlay() {
   timer = setInterval(() => {
     current = (current + 1) % posters.length;
+    openedInfoIndex = null;
     render();
   }, 3200);
 }
