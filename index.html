@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>MVP 人物海报轮播</title>
 
 <style>
@@ -20,6 +20,15 @@ body {
     linear-gradient(135deg, #f8f2ea, #efe6dc);
   color: #24170f;
   overflow-x: hidden;
+}
+
+  html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
 }
 
 .section {
@@ -48,11 +57,13 @@ body {
 
 .stage {
   position: relative;
-  height: 620px;
-  perspective: 1400px;
+  width: 100vw;
+  height: 520px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  perspective: 1200px;
 }
 
 .poster {
