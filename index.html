@@ -206,6 +206,10 @@ button {
   font-weight: 700;
   box-shadow: 0 10px 30px rgba(120,68,24,.12);
   transition: .25s ease;
+
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 button:hover {
@@ -682,6 +686,18 @@ document.addEventListener("keydown", (e) => {
 
 render();
 startAutoPlay();
+
+  let lastTouchEnd = 0;
+
+document.addEventListener("touchend", function (event) {
+  const now = Date.now();
+
+  if (now - lastTouchEnd <= 300) {
+    event.preventDefault();
+  }
+
+  lastTouchEnd = now;
+}, { passive: false });
 </script>
 
 </body>
